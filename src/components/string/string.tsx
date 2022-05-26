@@ -66,14 +66,13 @@ export const StringComponent: React.FC = () => {
   }
 
   //Запуск функции перестановки по нажатию кнопки.
-  const handleClick = async () => {
+  const handleClick = () => {
     //Вернуть в дефолтное состояние, если строка уже отсортирована.
     if(charArr[0].state === 'modified') {
       setCharArr(charArr.map((symbol: any) => {
         symbol.state = ElementStates.Default;
         return symbol
       }))
-      await awaitingChanges(SHORT_DELAY_IN_MS);
     }
     recursion(charArr);
   }
