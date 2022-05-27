@@ -7,6 +7,7 @@ import { ElementStates } from "../../types/element-states";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 import styles from "./string.module.css";
+import { awaitingChanges } from "../../utils/utils";
 
 interface symbolProps {
   symbol: string;
@@ -25,8 +26,6 @@ export const StringComponent: React.FC = () => {
     }
     setCharArr([...arr]);
   }
-
-  const awaitingChanges = async (millis: number) => new Promise(resolve => setTimeout(resolve, millis));
 
   //Перестановка двух символов.
   const swap = (arr: Array<symbolProps>, leftInd: number, rightInd: number) => {
@@ -68,7 +67,7 @@ export const StringComponent: React.FC = () => {
   //Запуск функции перестановки по нажатию кнопки.
   const handleClick = async () => {
     //Вернуть в дефолтное состояние, если строка уже отсортирована.
-    if(charArr[0].state === 'modified') {
+    if (charArr[0].state === 'modified') {
       setCharArr(charArr.map((symbol: any) => {
         symbol.state = ElementStates.Default;
         return symbol
@@ -96,12 +95,13 @@ export const StringComponent: React.FC = () => {
       <div className={`${styles['flex-container']}`}>
         <ul className={styles.list}>
           {charArr && charArr.map((el: symbolProps, ind) =>
-            <Circle
-              extraClass={`${styles['list-elem']}`}
-              letter={el.symbol}
-              key={ind}
-              state={el.state}
-            />)}
+            <li className={`${styles['list-elem']}` } key={ind}>
+              <Circle
+                letter={el.symbol}
+                state={el.state}
+              />
+            </li>
+          )}
         </ul>
       </div>
     </SolutionLayout>

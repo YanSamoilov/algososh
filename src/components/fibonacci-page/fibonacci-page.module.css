@@ -1,12 +1,12 @@
+.flex-container {
+    display: flex;
+    justify-content: center;
+}
+
 .input {
     max-width: 377px;
 
     margin-right: 12px;
-}
-
-.flex-container {
-    display: flex;
-    justify-content: center;
 }
 
 .list {
@@ -19,7 +19,7 @@
 }
 
 .list-elem {
-    margin: 0 16px 16px 0;
+    margin-right: 16px;
 }
 
 .list-elem:last-of-type {
