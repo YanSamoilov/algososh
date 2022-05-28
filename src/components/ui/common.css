@@ -23,6 +23,7 @@
   --default-color: #0032ff;
   --changing-color: #d252e1;
   --modified-color: #7fe051;
+  --active-color: #00a2ff;
 
   --common-transition: all 0.3s ease-in;
 }

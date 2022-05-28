@@ -5,34 +5,15 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { ElementStates } from "../../types/element-states";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { awaitingChanges, swap } from "../../utils/utils";
+import { symbolProps } from "../../types/data";
+import { changeState } from "../../utils/change-status";
 
 import styles from "./string.module.css";
-import { awaitingChanges } from "../../utils/utils";
-
-interface symbolProps {
-  symbol: string;
-  state: ElementStates;
-}
 
 export const StringComponent: React.FC = () => {
   const [charArr, setCharArr] = useState<Array<symbolProps>>([]);
   const [inProgress, setInProgress] = useState<boolean>(false);
-
-  //Изменить статус/внешний вид символов.
-  const changeState = (arr: any, status: string, start: number, end?: number) => {
-    arr[start].state = status;
-    if (end) {
-      arr[end].state = status;
-    }
-    setCharArr([...arr]);
-  }
-
-  //Перестановка двух символов.
-  const swap = (arr: Array<symbolProps>, leftInd: number, rightInd: number) => {
-    const temp = arr[leftInd];
-    arr[leftInd] = arr[rightInd];
-    arr[rightInd] = temp;
-  }
 
   //Переставить символы с анимацией.
   const recursion = async (arr: Array<symbolProps>) => {
@@ -40,21 +21,20 @@ export const StringComponent: React.FC = () => {
     let end = arr.length - 1;
     for (let start = 0; start <= end; start++) {
       if (start === end) {
-        changeState(arr, ElementStates.Changing, start);
+        changeState(arr, ElementStates.Changing, start, setCharArr);
         await awaitingChanges(250);
-        changeState(arr, ElementStates.Modified, start);
+        changeState(arr, ElementStates.Modified, start, setCharArr);
       }
-      changeState(arr, ElementStates.Changing, start, end);
+      changeState(arr, ElementStates.Changing, start, setCharArr, end);
       await awaitingChanges(SHORT_DELAY_IN_MS);
       swap(arr, start, end);
-      changeState(arr, ElementStates.Modified, start, end);
+      changeState(arr, ElementStates.Modified, start, setCharArr, end);
       await awaitingChanges(SHORT_DELAY_IN_MS);
       end--;
     }
     setInProgress(false);
   }
 
-  //Рендер вводимых символов.
   const handleChange = (event: any) => {
     setCharArr(event.target.value.split('').map((symbol: any) => {
       return {
@@ -94,7 +74,7 @@ export const StringComponent: React.FC = () => {
       <div className={`${styles['flex-container']}`}>
         <ul className={styles.list}>
           {charArr && charArr.map((el: symbolProps, ind) =>
-            <li className={`${styles['list-elem']}` } key={ind}>
+            <li className={`${styles['list-elem']}`} key={ind}>
               <Circle
                 letter={el.symbol}
                 state={el.state}
