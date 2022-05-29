@@ -1,22 +1,11 @@
 .flex-container {
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
-.flex-container-list {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    min-height: 390px;
-}
-
-.radio {
-    margin-right: 40px;
-}
-
-.radio:last-of-type {
-    margin-right: 52px;
+.input {
+    margin-right: 12px;
+    max-width: 377px;
 }
 
 .button {
@@ -33,7 +22,7 @@
 
 .list {
     padding: 0;
-    margin: 48px 0 0;
+    margin: 22x 0 0;
     list-style-type: none;
 
     display: flex;
@@ -42,15 +31,13 @@
 }
 
 .list-elem {
-    margin: 0 10px 0 0;
+    margin: 0 16px 0 0;
 }
 
 .list-elem:last-of-type {
     margin-right: 0;
 }
 
-.column {
-    display: flex;
-    flex-direction: column;
-    
+.list-el-info {
+    margin: 0 0 8px 0;
 }
