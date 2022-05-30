@@ -1,71 +1,42 @@
 import React, { useState } from "react";
-import { SHORT_DELAY_IN_MS } from "../../constants/delays";
-import { symbolProps } from "../../types/data";
-import { ElementStates } from "../../types/element-states";
-import { awaitingChanges } from "../../utils/utils";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
+import { Stack } from "./stack-class";
 
 import styles from "./stack-page.module.css";
 
+let stack = new Stack();
+
 export const StackPage: React.FC = () => {
+
   const [inputValue, setInputValue] = useState<string>("");
-  const [stackValues, setStackValues] = useState<Array<symbolProps>>([]);
+  const [stackValues, setStackValues] = useState<any>(stack.values);
   const [inProgress, setInProgress] = useState<boolean>(false);
-
-  //Добавить элемент в конец стека.
-  const push = async (arrValues: Array<symbolProps>, newvalue: any) => {
-    setInProgress(true);
-    let elemToPush = {
-      state: ElementStates.Changing,
-      symbol: newvalue
-    }
-    arrValues.push(elemToPush);
-    setStackValues([...arrValues]);
-    await awaitingChanges(SHORT_DELAY_IN_MS);
-    arrValues[arrValues.length - 1].state = ElementStates.Default;
-    setStackValues([...arrValues]);
-    setInProgress(false);
-  }
-
-  //Удалить элемент с конеца стека.
-  const pop = async (arrValues: Array<symbolProps>) => {
-    setInProgress(true);
-    arrValues[arrValues.length - 1].state = ElementStates.Changing;
-    setStackValues([...arrValues]);
-    await awaitingChanges(SHORT_DELAY_IN_MS);
-    arrValues.pop();
-    setStackValues([...arrValues]);
-    setInProgress(false);
-  }
 
   //Сборос инпута.
   const resetInput = () => {
     document.querySelectorAll('input')[0].value = "";
   }
 
-  //Очистить все данные.
-  const resetStack = (arrValues: Array<symbolProps>) => {
-    arrValues.length = 0;
-    setStackValues([...arrValues]);
-  }
-
   const handleResetStack = () => {
-    resetStack(stackValues);
+    stack.resetStack(setStackValues);
   }
 
-  const handlePush = () => {
-    push(stackValues, inputValue);
+  const handlePush = async () => {
+    setInProgress(true);
+    stack.push(inputValue, setStackValues);
     setInputValue("");
     resetInput();
+    setInProgress(false);
   }
 
-  const handlePop = () => {
-    pop(stackValues);
+  const handlePop = async () => {
+    setInProgress(true);
+    await stack.pop(setStackValues);
+    setInProgress(false);
   }
-
 
   return (
     <SolutionLayout title="Стек">
@@ -98,7 +69,7 @@ export const StackPage: React.FC = () => {
 
       <div className={`${styles['flex-container']}`}>
         <ul className={styles.list}>
-          {stackValues && stackValues.map((elem, ind) =>
+          {stackValues && stackValues.map((elem: any, ind: any) =>
             <li className={`${styles['list-elem']}`} key={ind}>
               {ind === stackValues.length - 1 &&
                 <p className={`${styles['list-el-info']}`}>top</p>}
