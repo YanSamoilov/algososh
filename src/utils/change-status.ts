@@ -11,7 +11,7 @@ export const changingStateActiveBubble = (arr: any, active: number, status: stri
 
 //Сброс статусов после окончания цикла сортировки пузырьком.
 export const chacngeStateAfterLoopBubble = (arr: any, end: number, callback: Function) => {
-    if (end != 0) arr[end - 1].state = ElementStates.Default;
+    if (end !== 0) arr[end - 1].state = ElementStates.Default;
     arr[end].state = ElementStates.Modified;
     callback([...arr]);
 }
@@ -38,7 +38,7 @@ export const forChangingStateChoice = (arr: any, forChange: number, callback: Fu
     //Изменяем статус на changing наименьшего на настоящий момент элемента.
     arr[forChange].state = ElementStates.Changing;
 
-    //Возвращаем статус default предыдущему элементу, если найден новый по условию и проверка, 
+    //Возвращаем статус default предыдущему элементу, если найден новый по условию и проверка,
     //чтобы это была не первая колонка.
     if (previous && start?.toString() && previous !== start) arr[previous].state = ElementStates.Default;
 
