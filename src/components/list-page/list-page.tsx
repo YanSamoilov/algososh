@@ -31,6 +31,7 @@ export const ListPage: React.FC = () => {
   const [isIndexValid, setIsIndexValid] = useState<boolean>(true);
   const [isInputIndexEmpty, setIsInputIndexEmpty] = useState<boolean>(true);
   const [isListEmpty, setIsListEmpty] = useState<boolean>(false);
+  const [inProgress, setInProgress] = useState<boolean>(false);
 
   useEffect(() => {
     const numberInputIndex = Number(inputIndex);
@@ -50,6 +51,7 @@ export const ListPage: React.FC = () => {
   }, [listValues])
 
   const handlePrepend = async () => {
+    setInProgress(true);
     //Если список пустой, то запускается простая анимация.
     if (listValues === null) {
       list.prepend(inputValue);
@@ -70,9 +72,11 @@ export const ListPage: React.FC = () => {
       animationByPrependAndEmptyList(list, setListValues);
     }
     resetInput(InputsByListPage.Value);
+    setInProgress(false);
   }
 
   const handleAppend = async () => {
+    setInProgress(true);
     //Если список пустой, то запускается простая анимация.
     if (listValues === null) {
       list.append(inputValue);
@@ -94,9 +98,11 @@ export const ListPage: React.FC = () => {
       animationByAppendList(list, setListValues, tailIndex);
     }
     resetInput(InputsByListPage.Value);
+    setInProgress(false);
   }
 
   const handleAddByIndex = async () => {
+    setInProgress(true);
     //Проверка, что индекс от 0 и меньше длины списка. Можно блокировать кнопку или выбрасывать ошибку.
     if (+inputIndex >= 0 && +inputIndex <= list.length + 1) {
       //Если список пустой, делаем prepend без показа предварительного круга сверху.
@@ -122,9 +128,11 @@ export const ListPage: React.FC = () => {
       }
     }
     resetInput(InputsByListPage.Index);
+    setInProgress(false);
   }
 
   const handleShift = async () => {
+    setInProgress(true);
     if (listValues.length !== 0) {
       //Значение для удаления.
       const deleteValue = listValues[0].value;
@@ -140,9 +148,11 @@ export const ListPage: React.FC = () => {
       setListValues(list.toArray);
     }
     resetInput(InputsByListPage.Value);
+    setInProgress(false);
   }
 
   const handlePop = async () => {
+    setInProgress(true);
     if (listValues.length !== 0) {
       //Значение для удаления.
       const deleteValue = listValues[listValues.length - 1].value;
@@ -158,9 +168,11 @@ export const ListPage: React.FC = () => {
       setListValues(list.toArray);
     }
     resetInput(InputsByListPage.Value);
+    setInProgress(false);
   }
 
   const handleDeleteByIndex = async () => {
+    setInProgress(true);
     const inputIndexInNumber = +inputIndex;
     //Если удаление по индексу 0, то выполняем shift со всей анимацией.
     if(inputIndexInNumber === 0) {
@@ -188,6 +200,7 @@ export const ListPage: React.FC = () => {
     }
     //Сброс инпутов.
     resetInput(InputsByListPage.Index);
+    setInProgress(false);
   }
 
   const handleInputIndexChange = (e: any) => {
@@ -228,25 +241,25 @@ export const ListPage: React.FC = () => {
           text={"Добавить в head"}
           extraClass={styles.button}
           onClick={handlePrepend}
-          disabled={inputValue === ""}
+          disabled={inputValue === "" || inProgress}
         />
         <Button
           text={"Добавить в tail"}
           extraClass={styles.button}
           onClick={handleAppend}
-          disabled={inputValue === ""}
+          disabled={inputValue === "" || inProgress}
         />
         <Button
           text={"Удалить из head"}
           extraClass={styles.button}
           onClick={handleShift}
-          disabled={isListEmpty}
+          disabled={isListEmpty || inProgress}
         />
         <Button
           text={"Удалить из tail"}
           extraClass={styles.button}
           onClick={handlePop}
-          disabled={isListEmpty}
+          disabled={isListEmpty || inProgress}
         />
       </div>
       <div className={`${styles['flex-container']}`}>
@@ -258,13 +271,13 @@ export const ListPage: React.FC = () => {
           text={"Добавить по индексу"}
           extraClass={`${styles['button-long']}`}
           onClick={handleAddByIndex}
-          disabled={isIndexValid || isInputIndexEmpty || inputValue === ""}
+          disabled={isIndexValid || isInputIndexEmpty || inputValue === "" || inProgress}
         />
         <Button
           text={"Удалить по индексу"}
           extraClass={`${styles['button-long']}`}
           onClick={handleDeleteByIndex}
-          disabled={isIndexValid || isInputIndexEmpty}
+          disabled={isIndexValid || isInputIndexEmpty || inProgress}
         />
       </div>
       <div className={`${styles['flex-container']}`}>

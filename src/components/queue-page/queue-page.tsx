@@ -1,23 +1,55 @@
 import React, { useState } from "react";
+import { DELAY_IN_MS } from "../../constants/delays";
+import { queue } from "../../constants/queue";
 import { symbolProps } from "../../types/data";
+import { ElementStates } from "../../types/element-states";
+import { awaitingChanges } from "../../utils/utils";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
-import { Queue } from "./queue-class";
 
 import styles from "./queue-page.module.css";
 
-const queue = new Queue(7);
+const firstQueueValues = Array(7).fill({
+  state: ElementStates.Default,
+  symbol: ""
+})
 
 export const QueuePage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
-  const [queueValues, setQueue] = useState<Array<symbolProps>>(queue.values);
+  const [queueValues, setQueue] = useState<Array<symbolProps>>([...firstQueueValues]);
   const [inProgress, setInProgress] = useState<boolean>(false);
 
   const handleEnqueue = async () => {
     setInProgress(true);
-    await queue.enqueue(inputValue, setQueue);
+    if (queue.isEmpty()) {
+      queue.enqueue(inputValue);
+      queueValues[0] = {
+        symbol: inputValue,
+        state: ElementStates.Changing
+      }
+      await awaitingChanges(DELAY_IN_MS);
+      queueValues[0].state = ElementStates.Default;
+    }
+    else if (queue.getTail() === queue.values.length - 1 && queue.isEmptyElem(0)) {
+      queue.enqueue(inputValue);
+      queueValues[0] = {
+        symbol: inputValue,
+        state: ElementStates.Changing
+      }
+      await awaitingChanges(DELAY_IN_MS);
+      queueValues[0].state = ElementStates.Default;
+    }
+    else if (queue.getTail() + 1 < queue.values.length && queue.isEmptyElem(queue.getTail() + 1)) {
+      queue.enqueue(inputValue);
+      queueValues[queue.getTail()] = {
+        symbol: inputValue,
+        state: ElementStates.Changing
+      }
+      await awaitingChanges(DELAY_IN_MS);
+      queueValues[queue.getTail()].state = ElementStates.Default;
+    }
     setInProgress(false);
     setInputValue("");
     resetInput();
@@ -25,12 +57,19 @@ export const QueuePage: React.FC = () => {
 
   const handleDequeue = async () => {
     setInProgress(true);
-    await queue.dequeue(setQueue);
+    queueValues[queue.getHead()].state = ElementStates.Changing;
+    await awaitingChanges(DELAY_IN_MS);
+    queueValues[queue.getHead()] = {
+      state: ElementStates.Default,
+      symbol: ""
+    };
+    queue.dequeue();
     setInProgress(false);
   }
 
   const handleClear = () => {
-    queue.clear(setQueue);
+    queue.clear();
+    setQueue([...firstQueueValues]);
   }
 
   //Сборос инпута.
@@ -57,12 +96,12 @@ export const QueuePage: React.FC = () => {
           text={"Удалить"}
           extraClass={styles.button}
           onClick={handleDequeue}
-          disabled={inProgress}
+          disabled={inProgress || queue.isEmpty()}
         />
         <Button
           text={"Очистить"}
           extraClass={styles.button}
-          disabled={inProgress}
+          disabled={inProgress || queue.isEmpty()}
           onClick={handleClear}
         />
       </div>
