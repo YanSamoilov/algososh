@@ -33,6 +33,7 @@ export const animationAddByIndexList = async (list: any, setListValues: Function
   //Поиск необходимого элемента с изменением его статуса от головы.
   while (currentInd < ind - 1) {
     if (currentNode) {
+      setIndForPrelim(currentInd);
       currentNode.state = ElementStates.Changing;
       setListValues(list.toArray);
       await awaitingChanges(DELAY_IN_MS);
@@ -44,11 +45,11 @@ export const animationAddByIndexList = async (list: any, setListValues: Function
   currentNode.state = ElementStates.Changing;
   //Отобразить список.
   setListValues(list.toArray);
+  setIndForPrelim(currentInd);
   await awaitingChanges(DELAY_IN_MS);
   list.addByIndex(inputValue, +ind, false);
-  //Удалить отображение предварительного круга со значением.
   setIndForPrelim(-1);
-  //Изменить статус первого элемента на модифицированный.
+  //Изменить статус элемента на модифицированный.
   currentNode.next.state = ElementStates.Modified;
   setListValues(list.toArray);
   await awaitingChanges(DELAY_IN_MS);
@@ -70,8 +71,6 @@ export const animationByPop = async (list: any, setListValues: Function) => {
 }
 
 export const animationDeleteByIndex = async (list: any, indexForDelete: number, setListValues: Function) => {
-  console.log(indexForDelete);
-
   let currentInd = 0;
   let currentNode = list.head;
   //Поиск необходимого элемента с изменением его статуса от головы.

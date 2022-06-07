@@ -72,9 +72,13 @@ export const QueuePage: React.FC = () => {
     setQueue([...firstQueueValues]);
   }
 
-  //Сборос инпута.
+  //Сброс инпута.
   const resetInput = () => {
-    document.querySelectorAll('input')[0].value = "";
+    setInputValue("");
+  }
+
+  const handleInputValue = (e: any) => {
+    setInputValue(e.target.value)
   }
 
   return (
@@ -83,8 +87,9 @@ export const QueuePage: React.FC = () => {
         <Input
           maxLength={4}
           extraClass={styles.input}
-          isLimitText={true}
-          onChange={(e: any) => { setInputValue(e.target.value) }}
+          isLimitText
+          value={inputValue}
+          onChange={handleInputValue}
         />
         <Button
           text={"Добавить"}

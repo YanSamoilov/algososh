@@ -23,44 +23,41 @@ export class List<T> {
   prepend = (value: T) => {
     if (this.length === -1) {
       this.addToEmptyList(value);
+      return
     }
-    else {
-      const node = new ListNode<T>(value, ElementStates.Default, this.head);
-      this.head = node;
-      this.length++;
-      return this
-    }
+    const node = new ListNode<T>(value, ElementStates.Default, this.head);
+    this.head = node;
+    this.length++;
+    return this
   }
 
   append = (value: T) => {
     if (this.tail === null) {
       this.addToEmptyList(value);
+      return
     }
-    else {
-      const node = new ListNode<T>(value, ElementStates.Default);
-      this.tail.next = node;
-      this.tail = node;
-      this.length++;
-      return this
-    }
+    const node = new ListNode<T>(value, ElementStates.Default);
+    this.tail.next = node;
+    this.tail = node;
+    this.length++;
+    return this
   }
 
   shift = () => {
     if (this.length === -1) {
       return this
     }
-    else if (this.head !== null) {
+
+    if (this.head !== null) {
       //Если один элелемент, то голова и хвост null.
       if (this.length === 0) {
-        this.tail = null;
-        this.head = null;
-        this.length = -1;
+        this.reset();
+        return
       }
       //Если элементы еще есть, то head помещается на следующий элемент.
-      else {
-        this.head = this.head.next;
-        this.length--;
-      }
+      this.head = this.head.next;
+      this.length--;
+
     }
   }
 
@@ -73,9 +70,7 @@ export class List<T> {
     let currentNode = this.head;
     //Если элемент один в списке, то обнуляем head и tail.
     if (this.length === 0) {
-      this.head = null;
-      this.tail = null;
-      this.length = -1;
+      this.reset();
       return this
     }
     //Если список не пустой, то ищем элемент ссылающийся на tail.
@@ -87,11 +82,15 @@ export class List<T> {
         this.length--;
         return this
       }
-      else {
-        //Перебираем элементы в цикле while выше.
-        currentNode = currentNode.next;
-      }
+      //Перебираем элементы в цикле while выше.
+      currentNode = currentNode.next;
     }
+  }
+
+  reset = () => {
+    this.head = null;
+    this.tail = null;
+    this.length = -1;
   }
 
   toArray = () => {
@@ -111,12 +110,12 @@ export class List<T> {
       return this
     }
     //Если добавлять в начало списка по индексу 0.
-    else if (ind === 0) {
+    if (ind === 0) {
       this.prepend(value);
       return this
     }
     //Если добавлять в конец списка.
-    else if (ind === this.length && isAppend) {
+    if (ind === this.length && isAppend) {
       this.append(value);
       return this
     }
@@ -143,11 +142,11 @@ export class List<T> {
       return this
     }
     //Если начало списка.
-    else if (ind === 0) {
+    if (ind === 0) {
       this.shift();
     }
     //Если конец списка.
-    else if (ind === this.length) {
+    if (ind === this.length) {
       this.pop();
     }
     let currentInd = 0;
