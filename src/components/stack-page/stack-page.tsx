@@ -50,14 +50,18 @@ export const StackPage: React.FC = () => {
     setInProgress(false);
   }
 
+  const handleInputValue = (e: any) => {
+    setInputValue(e.target.value);
+  }
+
   return (
     <SolutionLayout title="Стек">
       <div className={`${styles['flex-container']}`}>
         <Input
           maxLength={4}
           extraClass={styles.input}
-          isLimitText={true}
-          onChange={(e: any) => { setInputValue(e.target.value) }}
+          isLimitText
+          onChange={handleInputValue}
         />
         <Button
           text={"Добавить"}

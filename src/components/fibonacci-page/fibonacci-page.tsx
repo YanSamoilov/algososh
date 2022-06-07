@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { fiboCalc } from "../../utils/fibonacci";
 import { awaitingChanges } from "../../utils/utils";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
@@ -7,6 +8,18 @@ import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 
 import styles from "./fibonacci-page.module.css";
+
+//Рендер каждого числа.
+const renderNum = (num: number, ind: number) => {
+  return (
+    <li className={`${styles['list-elem']}`} key={ind}>
+      <Circle
+        letter={`${num}`}
+      />
+      <p>{ind}</p>
+    </li>
+  )
+}
 
 export const FibonacciPage: React.FC = () => {
   const [inputNum, setInputNum] = useState<number>(0);
@@ -18,41 +31,21 @@ export const FibonacciPage: React.FC = () => {
   useEffect(() => {
     (inputNum > 0 && inputNum < 20) ? setIsNumCorrect(true) : setIsNumCorrect(false);
   }, [inputNum]);
-  
-  //Фибоначчи.
-  const fiboCalc = (num: number, memo: Record<number, number> = {}): number => {
-    if (num in memo) {
-      return memo[num];
-    }  
-    if (num <= 2) {
-      return 1
-    }
-    memo[num] = fiboCalc(num - 1, memo) + fiboCalc(num - 2, memo);
-    return memo[num];
-  }
 
   //Нажатие кнопки Рассчитать.
-  const handleClickToShow = async () => {
+  const handleClickToShow = useCallback(async () => {
     setInProgress(true);
-    let nums = [];
+    const nums = [];
     for (let i = 1; i <= inputNum + 1; i++) {
       await awaitingChanges(SHORT_DELAY_IN_MS)
       nums.push(fiboCalc(i))
       setFiboNums([...nums]);
     }
     setInProgress(false);
-  }
+  }, [inputNum])
 
-  //Рендер каждого числа.
-  const renderNum = (num: number, ind: number) => {
-    return (
-      <li className={`${styles['list-elem']}`} key={ind}>
-        <Circle
-          letter={`${num}`}
-        />
-        <p>{ind}</p>
-      </li>
-    )
+  const handleInputNumber = (e: any) => {
+    setInputNum(+e.target.value)
   }
 
   return (
@@ -61,10 +54,10 @@ export const FibonacciPage: React.FC = () => {
 
         <Input
           extraClass={styles.input}
-          isLimitText={true}
+          isLimitText
           max={19}
           type={"number"}
-          onChange={(e: any) => setInputNum(+e.target.value)}
+          onChange={handleInputNumber}
         />
 
         <Button

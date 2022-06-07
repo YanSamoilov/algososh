@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { DELAY_IN_MS } from "../../constants/delays";
 import { firstRandomListLength, list, reg } from "../../constants/list-page";
 import { ElementStates } from "../../types/element-states";
@@ -32,23 +32,38 @@ export const ListPage: React.FC = () => {
   const [isInputIndexEmpty, setIsInputIndexEmpty] = useState<boolean>(true);
   const [isListEmpty, setIsListEmpty] = useState<boolean>(false);
   const [inProgress, setInProgress] = useState<boolean>(false);
+  const [inputIndexField, setInputIndexField] = useState<number | string>("");
+  const [disabledBtn, setDisabledBtn] = useState<boolean>(true);
 
   useEffect(() => {
     const numberInputIndex = Number(inputIndex);
-    numberInputIndex < 0 || numberInputIndex  > listValues.length - 1  ? setIsIndexValid(true) : setIsIndexValid(false);
+    setIsIndexValid(numberInputIndex < 0 || numberInputIndex > listValues.length - 1);
   }, [inputIndex]);
+
+  useEffect(() => {
+    setDisabledBtn(inputValue === "" || inProgress);
+  }, [inputValue, inProgress])
 
   useEffect(() => {
     for (let i = 0; i < firstRandomListLength; i++) {
       list.prepend(Math.floor(Math.random() * 100).toString());
     }
-    setListValues(list.toArray())
+    setListValues(list.toArray());
+    return () => {
+      setListValues(null);
+      list.head = null;
+      list.tail = null;
+    }
   }, [])
 
   useEffect(() => {
-    if(listValues)
-      listValues.length === 0 ? setIsListEmpty(true) : setIsListEmpty(false);
+    if (listValues)
+      setIsListEmpty(listValues.length === 0);
   }, [listValues])
+
+  useEffect(() => {
+    inputIndex === -1 ? setInputIndexField("") : setInputIndexField(+inputIndex);
+  }, [inputIndex])
 
   const handlePrepend = async () => {
     setInProgress(true);
@@ -57,9 +72,7 @@ export const ListPage: React.FC = () => {
       list.prepend(inputValue);
       //Запуск анимации.
       animationByPrependAndEmptyList(list, setListValues);
-    }
-    //Если список не пустой.
-    else {
+    } else {
       //Предварительный круг со значением.
       setPrelimForAdd(<Circle state={ElementStates.Changing} letter={inputValue} isSmall={true} />)
       //Указать индекс предварительного значения для отображения предварительного круга.
@@ -81,9 +94,7 @@ export const ListPage: React.FC = () => {
     if (listValues === null) {
       list.append(inputValue);
       animationByPrependAndEmptyList(list, setListValues);
-    }
-    //Если список не пустой.
-    else {
+    } else {
       //Индекс хвоста списка.
       const tailIndex = listValues.length - 1;
       //Предварительный круг со значением.
@@ -113,13 +124,9 @@ export const ListPage: React.FC = () => {
       //Если список не пустой, а индекс 0, происходит выполнение функции prepend.
       else if (+inputIndex === 0) {
         handlePrepend();
-      }
-      //Если индекс между head и tail.
-      else {
+      } else {
         //Предварительный круг со значением.
         setPrelimForAdd(<Circle state={ElementStates.Changing} letter={inputValue} isSmall={true} />);
-        //Указать индекс предварительного значения для отображения предварительного круга.
-        setIndForPrelim(+inputIndex);
         await awaitingChanges(DELAY_IN_MS);
         //Запуск анимации поиска неободимого элемента по индексу и вставка его в список.
         await animationAddByIndexList(list, setListValues, setIndForPrelim, inputIndex, inputValue);
@@ -175,18 +182,18 @@ export const ListPage: React.FC = () => {
     setInProgress(true);
     const inputIndexInNumber = +inputIndex;
     //Если удаление по индексу 0, то выполняем shift со всей анимацией.
-    if(inputIndexInNumber === 0) {
+    if (inputIndexInNumber === 0) {
       handleShift();
+      return
     }
     //Если удаление по индексу 0, то выполняем pop со всей анимацией.
-    else if(inputIndexInNumber === listValues.length - 1) {
+    if (inputIndexInNumber === listValues.length - 1) {
       handlePop();
-    }
-    else {
+    } else {
       //Считываем какое значение записано к удалению.
       const deleteValue = listValues[inputIndexInNumber].value;
       //Запуск анимации при удалении.
-      await animationDeleteByIndex(list , inputIndexInNumber, setListValues);
+      await animationDeleteByIndex(list, inputIndexInNumber, setListValues);
       //Установить круг ниже необходимого индекса для анимации удаления и указание места.
       setValueForDelete(<Circle state={ElementStates.Changing} letter={deleteValue} isSmall={true} />)
       setIndForDelete(inputIndexInNumber);
@@ -205,28 +212,30 @@ export const ListPage: React.FC = () => {
 
   const handleInputIndexChange = (e: any) => {
     const inputIndexValue = e.target.value;
-    if(reg.test(inputIndexValue)) {
+    if (reg.test(inputIndexValue)) {
       setInputIndex(inputIndexValue);
       setIsInputIndexEmpty(false);
+      return
     }
-    else {
-      setIsInputIndexEmpty(true)
-    }
+    setIsInputIndexEmpty(true);
+    setInputIndex(-1);
   }
 
-    //Сборос инпута.
-    const resetInput = (typeInput: string) => {
-      const inputsArray = document.querySelectorAll('input');
-      if(typeInput === "value") {
-        inputsArray[0].value = "";
-      }
-      else if (typeInput === "index") {
-        inputsArray[0].value = "";
-        inputsArray[1].value = "";
-      }
+  //Сброс инпута.
+  const resetInput = (typeInput: string) => {
+    if (typeInput === "value") {
+      setInputValue("");
+      return
+    }
+    if (typeInput === "index") {
       setInputIndex(-1);
       setInputValue("");
     }
+  }
+
+  const handleInputValue = useCallback((e) => {
+    setInputValue(e.target.value)
+  }, [])
 
   return (
     <SolutionLayout title="Связный список">
@@ -234,20 +243,21 @@ export const ListPage: React.FC = () => {
         <Input
           maxLength={4}
           extraClass={styles.input}
-          isLimitText={true}
-          onChange={(e: any) => { setInputValue(e.target.value) }}
+          isLimitText
+          onChange={handleInputValue}
+          value={inputValue}
         />
         <Button
           text={"Добавить в head"}
           extraClass={styles.button}
           onClick={handlePrepend}
-          disabled={inputValue === "" || inProgress}
+          disabled={disabledBtn}
         />
         <Button
           text={"Добавить в tail"}
           extraClass={styles.button}
           onClick={handleAppend}
-          disabled={inputValue === "" || inProgress}
+          disabled={disabledBtn}
         />
         <Button
           text={"Удалить из head"}
@@ -266,12 +276,13 @@ export const ListPage: React.FC = () => {
         <Input
           extraClass={styles.input}
           onChange={handleInputIndexChange}
+          value={inputIndexField}
         />
         <Button
           text={"Добавить по индексу"}
           extraClass={`${styles['button-long']}`}
           onClick={handleAddByIndex}
-          disabled={isIndexValid || isInputIndexEmpty || inputValue === "" || inProgress}
+          disabled={isIndexValid || isInputIndexEmpty || disabledBtn}
         />
         <Button
           text={"Удалить по индексу"}
