@@ -29,7 +29,7 @@ export const FibonacciPage: React.FC = () => {
 
   //Активация кнопки калькуляции при изменении поля ввода.
   useEffect(() => {
-    (inputNum > 0 && inputNum < 20) ? setIsNumCorrect(true) : setIsNumCorrect(false);
+    setIsNumCorrect(inputNum > 0 && inputNum < 20);
   }, [inputNum]);
 
   //Нажатие кнопки Рассчитать.
