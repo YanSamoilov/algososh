@@ -12,8 +12,8 @@ export const StringComponent: React.FC = () => {
   const [charArr, setCharArr] = useState<Array<symbolProps>>([]);
   const [inProgress, setInProgress] = useState<boolean>(false);
 
-  const handleChange = (event: any) => {
-    setCharArr(event.target.value.split('').map((symbol: any) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCharArr(event.target.value.split('').map((symbol: string) => {
       return {
         symbol: symbol,
         state: ElementStates.Default
@@ -25,7 +25,7 @@ export const StringComponent: React.FC = () => {
   const handleClick = async () => {
     //Вернуть в дефолтное состояние, если строка уже отсортирована.
     if (charArr[0].state === 'modified') {
-      setCharArr(charArr.map((symbol: any) => {
+      setCharArr(charArr.map((symbol: symbolProps) => {
         symbol.state = ElementStates.Default;
         return symbol
       }))

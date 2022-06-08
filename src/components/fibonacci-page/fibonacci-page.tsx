@@ -10,8 +10,7 @@ import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import styles from "./fibonacci-page.module.css";
 
 //Рендер каждого числа.
-const renderNum = (num: number, ind: number) => {
-  return (
+const renderNum = (num: number, ind: number) => (
     <li className={`${styles['list-elem']}`} key={ind}>
       <Circle
         letter={`${num}`}
@@ -19,7 +18,6 @@ const renderNum = (num: number, ind: number) => {
       <p>{ind}</p>
     </li>
   )
-}
 
 export const FibonacciPage: React.FC = () => {
   const [inputNum, setInputNum] = useState<number>(0);
@@ -44,7 +42,7 @@ export const FibonacciPage: React.FC = () => {
     setInProgress(false);
   }, [inputNum])
 
-  const handleInputNumber = (e: any) => {
+  const handleInputNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputNum(+e.target.value)
   }
 

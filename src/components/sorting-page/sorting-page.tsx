@@ -5,7 +5,7 @@ import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import { Direction } from "../../types/direction";
 import { ElementStates } from "../../types/element-states";
 import { Column } from "../ui/column/column";
-import { bubbleSorting, choiceSorting } from "../../utils/sorting";
+import { bubbleSorting, choiceSorting, randomArr } from "../../utils/sorting";
 import { numsProps } from "../../types/data";
 
 import styles from "./sorting-page.module.css";
@@ -16,19 +16,7 @@ export const SortingPage: React.FC = () => {
   const [numsSorting, setNumsSorting] = useState<Array<numsProps>>([]);
   const [inProgress, setInProgress] = useState<boolean>(false);
 
-  const randomArr = useCallback(() => {
-    let premNums = [];
-    const countNums = Math.floor(Math.random() * 14 + 3);
-    for (let i = 0; i < countNums; i++) {
-      premNums.push({
-        num: Math.floor(Math.random() * 101),
-        state: ElementStates.Default
-      });
-    }
-    setNumsSorting([...premNums]);
-  }, [])
-
-  const sorting = useCallback(async (direction: string, typeSort: string) => {
+  const startSorting = useCallback(async (direction: string, typeSort: string) => {
     //Сброс уже отсортированного массива.
     if (numsSorting[0].state === 'modified') {
       setNumsSorting(numsSorting.map((el: numsProps) => {
@@ -57,11 +45,15 @@ export const SortingPage: React.FC = () => {
   }
 
   const handleClickStartAscendingSorting = () => {
-    sorting('ascending', typeSort)
+    startSorting('ascending', typeSort)
   }
 
   const handleClickStartDescendingSorting = () => {
-    sorting('descending', typeSort)
+    startSorting('descending', typeSort)
+  }
+
+  const handleClickNewArr = () => {
+    randomArr(setNumsSorting);
   }
 
   return (
@@ -101,7 +93,7 @@ export const SortingPage: React.FC = () => {
         <Button
           text="Новый массив"
           extraClass={styles.button}
-          onClick={randomArr}
+          onClick={handleClickNewArr}
           isLoader={inProgress}
         />
 

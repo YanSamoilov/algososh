@@ -79,3 +79,15 @@ export const choiceSorting = async (direction: string, arr: Array<numsProps>, se
     chacngeStateAfterLoopChoice(arr, i, setNumsSorting);
   }
 }
+
+export const randomArr = (setNumsSorting: Function) => {
+  let premNums = [];
+  const countNums = Math.floor(Math.random() * 14 + 3);
+  for (let i = 0; i < countNums; i++) {
+    premNums.push({
+      num: Math.floor(Math.random() * 101),
+      state: ElementStates.Default
+    });
+  }
+  setNumsSorting([...premNums]);
+}

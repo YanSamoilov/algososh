@@ -1,7 +1,22 @@
 import { ElementStates } from "../../types/element-states";
 import { ListNode } from "./ListNode";
 
-export class List<T> {
+export interface IList<T> {
+  head: ListNode<T> | null;
+  tail: ListNode<T> | null;
+  length: number;
+  prepend: (value: T) => void;
+  append: (value: T) => void;
+  shift: () => void;
+  pop: () => void;
+  reset: () => void;
+  toArray: () => void;
+  addByIndex: (value: T, ind: number, isAppend: boolean) => void;
+  deleteByIndex: (ind: number) => void;
+  resetToDefault: (setListValues: Function) => void;
+}
+
+export class List<T> implements IList<T> {
   head: ListNode<T> | null = null;
   tail: ListNode<T> | null = null;
   length: number;
@@ -57,7 +72,6 @@ export class List<T> {
       //Если элементы еще есть, то head помещается на следующий элемент.
       this.head = this.head.next;
       this.length--;
-
     }
   }
 

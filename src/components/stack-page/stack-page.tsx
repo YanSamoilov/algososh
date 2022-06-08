@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { stack } from "../../constants/stack";
-import { pagesArrayProps } from "../../types/data";
+import { pagesArrayProps, symbolProps } from "../../types/data";
 import { ElementStates } from "../../types/element-states";
 import { awaitingChanges } from "../../utils/utils";
 import { Button } from "../ui/button/button";
@@ -14,12 +14,12 @@ import styles from "./stack-page.module.css";
 export const StackPage: React.FC = () => {
 
   const [inputValue, setInputValue] = useState<string>("");
-  const [stackValues, setStackValues] = useState<Array<pagesArrayProps>>([]);
+  const [stackValues, setStackValues] = useState<Array<symbolProps>>([]);
   const [inProgress, setInProgress] = useState<boolean>(false);
 
   //Сборос инпута.
   const resetInput = () => {
-    document.querySelectorAll('input')[0].value = "";
+    setInputValue("");
   }
 
   const handleResetStack = () => {
@@ -50,7 +50,7 @@ export const StackPage: React.FC = () => {
     setInProgress(false);
   }
 
-  const handleInputValue = (e: any) => {
+  const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   }
 
@@ -62,6 +62,7 @@ export const StackPage: React.FC = () => {
           extraClass={styles.input}
           isLimitText
           onChange={handleInputValue}
+          value={inputValue}
         />
         <Button
           text={"Добавить"}
@@ -85,7 +86,7 @@ export const StackPage: React.FC = () => {
 
       <div className={`${styles['flex-container']}`}>
         <ul className={styles.list}>
-          {stackValues && stackValues.map((elem: any, ind: any) =>
+          {stackValues && stackValues.map((elem: symbolProps, ind: number) =>
             <li className={`${styles['list-elem']}`} key={ind}>
               {ind === stackValues.length - 1 &&
                 <p className={`${styles['list-el-info']}`}>top</p>}
