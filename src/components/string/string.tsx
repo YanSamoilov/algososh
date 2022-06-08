@@ -12,7 +12,7 @@ export const StringComponent: React.FC = () => {
   const [charArr, setCharArr] = useState<Array<symbolProps>>([]);
   const [inProgress, setInProgress] = useState<boolean>(false);
 
-  const handleChange = (event: any) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCharArr(event.target.value.split('').map((symbol: any) => {
       return {
         symbol: symbol,

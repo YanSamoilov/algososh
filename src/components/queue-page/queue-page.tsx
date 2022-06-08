@@ -77,7 +77,7 @@ export const QueuePage: React.FC = () => {
     setInputValue("");
   }
 
-  const handleInputValue = (e: any) => {
+  const handleInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }
 

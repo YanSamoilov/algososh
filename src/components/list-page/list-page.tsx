@@ -19,13 +19,14 @@ import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 
 import styles from "./list-page.module.css";
+import { ListNode } from "./ListNode";
 
 export const ListPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [inputIndex, setInputIndex] = useState<number>(-1);
-  const [listValues, setListValues] = useState<any>(null);
-  const [prelimForAdd, setPrelimForAdd] = useState<any>(null);
-  const [valueForDelete, setValueForDelete] = useState<any>(null);
+  const [listValues, setListValues] = useState<Array<ListNode<any>>>([]);
+  const [prelimForAdd, setPrelimForAdd] = useState<React.ReactElement | null>(null);
+  const [valueForDelete, setValueForDelete] = useState<React.ReactElement | null>(null);
   const [indForPrelim, setIndForPrelim] = useState<number>(-1);
   const [indForDelete, setIndForDelete] = useState<number>(-1);
   const [isIndexValid, setIsIndexValid] = useState<boolean>(true);
@@ -50,7 +51,7 @@ export const ListPage: React.FC = () => {
     }
     setListValues(list.toArray());
     return () => {
-      setListValues(null);
+      setListValues([]);
       list.head = null;
       list.tail = null;
     }
@@ -210,10 +211,10 @@ export const ListPage: React.FC = () => {
     setInProgress(false);
   }
 
-  const handleInputIndexChange = (e: any) => {
+  const handleInputIndexChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputIndexValue = e.target.value;
     if (reg.test(inputIndexValue)) {
-      setInputIndex(inputIndexValue);
+      setInputIndex(+inputIndexValue);
       setIsInputIndexEmpty(false);
       return
     }
@@ -233,7 +234,7 @@ export const ListPage: React.FC = () => {
     }
   }
 
-  const handleInputValue = useCallback((e) => {
+  const handleInputValue = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value)
   }, [])
 
