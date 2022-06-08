@@ -48,16 +48,19 @@ export class Queue<T> implements IQueue<T> {
       this.values[0] = newvalue;
       this.setHead(0);
       this.setTail(0);
+      return
     }
     //Добавить значение в 0 индекс при заполнении очереди до конца.
-    else if (this.getTail() === this.values.length - 1 && this.isEmptyElem(0)) {
+    if (this.getTail() === this.values.length - 1 && this.isEmptyElem(0)) {
       this.values[0] = newvalue;
       this.setTail(0);
+      return
     }
     // //Добавить значение в следующий индекс.
-    else if (this.getTail() + 1 < this.values.length && this.isEmptyElem(this.getTail() + 1)) {
+    if (this.getTail() + 1 < this.values.length && this.isEmptyElem(this.getTail() + 1)) {
       this.values[this.getTail() + 1] = newvalue;
       this.setTail(this.getTail() + 1);
+      return
     }
   }
 
@@ -82,7 +85,7 @@ export class Queue<T> implements IQueue<T> {
 
     clear() {
       if (!this.isEmpty()) {
-        this.values.map((el) => el = "")
+        this.values.fill("");
         this.setHead(-1);
         this.setTail(-1);
       }

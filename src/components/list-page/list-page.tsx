@@ -17,14 +17,14 @@ import { Circle } from "../ui/circle/circle";
 import { ArrowIcon } from "../ui/icons/arrow-icon";
 import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
+import { IListNode } from "./ListNode";
 
 import styles from "./list-page.module.css";
-import { ListNode } from "./ListNode";
 
 export const ListPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [inputIndex, setInputIndex] = useState<number>(-1);
-  const [listValues, setListValues] = useState<Array<ListNode<any>>>([]);
+  const [listValues, setListValues] = useState<Array<IListNode<string>>>([]);
   const [prelimForAdd, setPrelimForAdd] = useState<React.ReactElement | null>(null);
   const [valueForDelete, setValueForDelete] = useState<React.ReactElement | null>(null);
   const [indForPrelim, setIndForPrelim] = useState<number>(-1);
@@ -156,6 +156,7 @@ export const ListPage: React.FC = () => {
       setListValues(list.toArray);
     }
     resetInput(InputsByListPage.Value);
+    resetInput(InputsByListPage.Index);
     setInProgress(false);
   }
 
@@ -176,6 +177,7 @@ export const ListPage: React.FC = () => {
       setListValues(list.toArray);
     }
     resetInput(InputsByListPage.Value);
+    resetInput(InputsByListPage.Index);
     setInProgress(false);
   }
 
@@ -294,7 +296,7 @@ export const ListPage: React.FC = () => {
       </div>
       <div className={`${styles['flex-container']}`}>
         <ul className={styles.list}>
-          {listValues && listValues.map((elem: any, ind: number) =>
+          {listValues && listValues.map((elem: IListNode<string>, ind: number) =>
             <li className={`${styles['list-elem']}`} key={ind}>
               <div>
                 {indForPrelim === ind &&
