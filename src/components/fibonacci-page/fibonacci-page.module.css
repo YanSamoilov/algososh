@@ -1,0 +1,27 @@
+.flex-container {
+    display: flex;
+    justify-content: center;
+}
+
+.input {
+    max-width: 377px;
+
+    margin-right: 12px;
+}
+
+.list {
+    padding: 0;
+    margin: 120px 0 0;
+    list-style-type: none;
+
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.list-elem {
+    margin-right: 16px;
+}
+
+.list-elem:last-of-type {
+    margin-right: 0;
+}

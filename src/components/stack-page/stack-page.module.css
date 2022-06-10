@@ -1,0 +1,43 @@
+.flex-container {
+    display: flex;
+    justify-content: center;
+}
+
+.input {
+    margin-right: 12px;
+    max-width: 377px;
+}
+
+.button {
+    margin-right: 12px;
+}
+
+.button:nth-of-type(2) {
+    margin-right: 80px;
+}
+
+.button:last-of-type {
+    margin-right: 0;
+}
+
+.list {
+    padding: 0;
+    margin: 22x 0 0;
+    list-style-type: none;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.list-elem {
+    margin: 0 16px 0 0;
+}
+
+.list-elem:last-of-type {
+    margin-right: 0;
+}
+
+.list-el-info {
+    margin: 0 0 8px 0;
+}
