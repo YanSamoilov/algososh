@@ -48,10 +48,10 @@ export const forChangingStateChoice = (arr: Array<numsProps>, forChange: number,
 
 //String-Page
 //Изменить статус/внешний вид символов.
-export const changeState = (arr: Array<numsProps | symbolProps>, status: ElementStates, start: number, callback: Function, end?: number) => {
+export const changeState = (arr: Array<symbolProps>, status: ElementStates, start: number, end?: number) => {
     arr[start].state = status;
     if (end) {
         arr[end].state = status;
     }
-    callback([...arr]);
+    return arr;
 }
