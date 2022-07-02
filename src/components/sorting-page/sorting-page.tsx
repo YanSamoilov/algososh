@@ -7,8 +7,9 @@ import { ElementStates } from "../../types/element-states";
 import { Column } from "../ui/column/column";
 import { bubbleSorting, choiceSorting, randomArr } from "../../utils/sorting";
 import { numsProps } from "../../types/data";
-
 import styles from "./sorting-page.module.css";
+import { awaitingChanges } from "../../utils/utils";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
 export const SortingPage: React.FC = () => {
 
@@ -16,7 +17,12 @@ export const SortingPage: React.FC = () => {
   const [numsSorting, setNumsSorting] = useState<Array<numsProps>>([]);
   const [inProgress, setInProgress] = useState<boolean>(false);
 
-  const startSorting = useCallback(async (direction: string, typeSort: string) => {
+  const sortAndWait = async (arr: any) => {
+    setNumsSorting([...arr]);
+    await awaitingChanges(SHORT_DELAY_IN_MS);
+  };
+
+  const startSorting = useCallback(async (direction: "ascending" | "descending", typeSort: string) => {
     //Сброс уже отсортированного массива.
     if (numsSorting[0].state === 'modified') {
       setNumsSorting(numsSorting.map((el: numsProps) => {
@@ -27,10 +33,23 @@ export const SortingPage: React.FC = () => {
     //Блокирование кнопок.
     setInProgress(true);
     //Сортировка выбором.
-    if (typeSort === "choice") await choiceSorting(direction, numsSorting, setNumsSorting);
+    if(typeSort === "choice") {
+      const arr = [...numsSorting];
+      let stepCounter = 1;
+      while (stepCounter !== choiceSorting(direction, arr).numberOfSteps) {
+        await sortAndWait(choiceSorting(direction, arr, stepCounter).resultArray);
+        stepCounter++;
+      }
+    }
     //Сортировка пузырьком.
     else {
-      await bubbleSorting(direction, numsSorting, setNumsSorting);
+      const arr = [...numsSorting];
+      arr.forEach((el) => (el.state = ElementStates.Default));
+      let stepCounter = 1;
+      while (stepCounter !== bubbleSorting(direction, arr).numberOfSteps) {
+        await sortAndWait(bubbleSorting(direction, arr, stepCounter).resultArray);
+        stepCounter++;
+      }
     }
     //Разблокирование кнопок.
     setInProgress(false);

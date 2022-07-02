@@ -1,84 +1,108 @@
-import { SHORT_DELAY_IN_MS } from "../constants/delays";
 import { numsProps } from "../types/data";
 import { ElementStates } from "../types/element-states";
-import { chacngeStateAfterLoopBubble, chacngeStateAfterLoopChoice, changingStateActiveBubble, changingStateActiveChoice, forChangingStateChoice } from "./change-status";
-import { awaitingChanges, swap } from "./utils";
+import { swap } from "./utils";
 
 //Сортировка пузырьком.
-export const bubbleSorting = async (direction: string, arr: Array<numsProps>, setNumsSorting: Function) => {
-  for (let i = arr.length - 1; i >= 0; i--) {
-    for (let j = 0; j < i; j++) {
-      //Смена статусов активных столбцов.
-      changingStateActiveBubble(arr, j, ElementStates.Active, setNumsSorting);
-      await awaitingChanges(SHORT_DELAY_IN_MS);
-      if (direction === "ascending") {
-        if (arr[j].num > arr[j + 1].num) {
-          //Смена статусов столбцов подлежащих перестановке.
-          changingStateActiveBubble(arr, j, ElementStates.Changing, setNumsSorting);
-          await awaitingChanges(SHORT_DELAY_IN_MS);
-          swap(arr, j, j + 1);
-          setNumsSorting(arr);
-          await awaitingChanges(SHORT_DELAY_IN_MS);
-        }
-      } else {
-        if (arr[j].num < arr[j + 1].num) {
-          //Смена статусов столбцов подлежащих перестановке.
-          changingStateActiveBubble(arr, j, ElementStates.Changing, setNumsSorting);
-          await awaitingChanges(SHORT_DELAY_IN_MS);
-          swap(arr, j, j + 1);
-          setNumsSorting(arr);
-          await awaitingChanges(SHORT_DELAY_IN_MS);
-        }
+export const bubbleSorting = (
+  direction: "ascending" | "descending",
+  arrayToSort: Array<numsProps>,
+  step?: number
+): { resultArray: Array<numsProps>; numberOfSteps: number } => {
+  const arr = [...arrayToSort];
+  arr.forEach((el) => (el.state = ElementStates.Default));
+  const { length } = arr;
+  let count = 0;
+  let isSwapped: boolean;
+  do {
+    isSwapped = false;
+    for (let i = 0; i < length - 1; i++) {
+      // Поменять стейт выбранных элементов.
+      arr[i].state = ElementStates.Changing;
+      arr[i + 1].state = ElementStates.Changing;
+      count++;
+      if (step && step === count)
+        return { resultArray: arr, numberOfSteps: count };
+      if (
+        (direction === "ascending" ? arr[i].num : arr[i + 1].num) >
+        (direction === "ascending" ? arr[i + 1].num : arr[i].num)
+      ) {
+        arr[i].state = ElementStates.Active;
+        arr[i + 1].state = ElementStates.Active;
+        count++;
+        if (step && step === count)
+          return { resultArray: arr, numberOfSteps: count };
+          swap(arr, i, i + 1);
+        arr[i].state = ElementStates.Active;
+        arr[i + 1].state = ElementStates.Active;
+        count++;
+        if (step && step === count)
+          return { resultArray: arr, numberOfSteps: count };
+          isSwapped = true;
       }
+      arr[i].state = ElementStates.Default;
+      arr[i + 1].state = ElementStates.Default;
     }
-    await awaitingChanges(SHORT_DELAY_IN_MS);
-    //Смена статусов после каждого цикла.
-    chacngeStateAfterLoopBubble(arr, i, setNumsSorting)
+  } while (isSwapped);
+  arr.forEach((el) => (el.state = ElementStates.Modified));
+  return { resultArray: arr, numberOfSteps: count };
+};
+
+// //Сортировка выбором.
+export const choiceSorting = (
+  direction: "ascending" | "descending",
+  arrayToSort: Array<numsProps>,
+  step?: number
+): { resultArray: Array<numsProps>; numberOfSteps: number } => {
+  const arr = [...arrayToSort];
+  arr.forEach((el) => (el.state = ElementStates.Default));
+  const { length } = arr;
+  let count = 0;
+  for (let i = 0; i < length; i++) {
+    let swapInd = i;
+    arr[i].state = ElementStates.Active;
+    count++;
+    if (step && step === count)
+      return { resultArray: arr, numberOfSteps: count };
+    for (let j = i + 1; j < length; j++) {
+      arr[j].state = ElementStates.Changing;
+      count++;
+      if (step && step === count)
+        return { resultArray: arr, numberOfSteps: count };
+      if (
+        (direction === "ascending" ? arr[swapInd].num : arr[j].num) >
+        (direction === "ascending" ? arr[j].num : arr[swapInd].num)
+      ) {
+        arr[j].state = ElementStates.Active;
+        arr[swapInd].state =
+          i === swapInd ? ElementStates.Active : ElementStates.Default;
+        swapInd = j;
+        count++;
+        if (step && step === count)
+          return { resultArray: arr, numberOfSteps: count };
+      }
+      if (j !== swapInd) arr[j].state = ElementStates.Default;
+    }
+    if (i === swapInd) {
+      arr[i].state = ElementStates.Modified;
+      count++;
+      if (step && step === count)
+        return { resultArray: arr, numberOfSteps: count };
+    }
+    else {
+      swap(arr, i, swapInd);
+      arr[i].state = ElementStates.Modified;
+      count++;
+      if (step && step === count)
+        return { resultArray: arr, numberOfSteps: count };
+
+      arr[swapInd].state = ElementStates.Default;
+      count++;
+      if (step && step === count)
+        return { resultArray: arr, numberOfSteps: count };
+    }
   }
-}
-
-//Сортировка выбором.
-export const choiceSorting = async (direction: string, arr: Array<numsProps>, setNumsSorting: Function) => {
-  const end = arr.length;
-
-  for (let i = 0; i < end; i++) {
-    //Установка как первого элемента как максимального/минимального.
-    let operationInd = i;
-    let operationColumn = arr[i].num;
-    //Изменение статуса первого элемента на changing.
-    forChangingStateChoice(arr, operationInd, setNumsSorting)
-
-    for (let j = i + 1; j < end; j++) {
-      //Изменить статус активного столбца и вернуть предыдущий в default/changing.
-      changingStateActiveChoice(arr, j, setNumsSorting)
-      await awaitingChanges(400);
-
-      //Выбор направления сортировки.
-      if (direction === 'ascending') {
-        if (arr[j].num < operationColumn) {
-          let previous = operationInd;
-          operationInd = j;
-          operationColumn = arr[j].num;
-          forChangingStateChoice(arr, operationInd, setNumsSorting, previous, i);
-        }
-      }
-      else if (direction === 'descending') {
-        if (arr[j].num > operationColumn) {
-          let previous = operationInd;
-          operationInd = j;
-          operationColumn = arr[j].num;
-          forChangingStateChoice(arr, operationInd, setNumsSorting, previous, i);
-        }
-      }
-    }
-    //Перестановка столбцов, если был найден новый.
-    if (i !== operationInd) {
-      swap(arr, i, operationInd);
-    }
-    //Сброс статусов на default, кроме первого столбца, он становится модифицированным.
-    chacngeStateAfterLoopChoice(arr, i, setNumsSorting);
-  }
-}
+  return { resultArray: arr, numberOfSteps: count };
+};
 
 export const randomArr = (setNumsSorting: Function) => {
   let premNums = [];
