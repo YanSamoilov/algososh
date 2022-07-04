@@ -75,7 +75,7 @@ export const ListPage: React.FC = () => {
       animationByPrependAndEmptyList(list, setListValues);
     } else {
       //Предварительный круг со значением.
-      setPrelimForAdd(<Circle state={ElementStates.Changing} letter={inputValue} isSmall={true} />)
+      setPrelimForAdd(<Circle state={ElementStates.Changing} letter={inputValue} isSmall={true} extraClass={styles.small} />)
       //Указать индекс предварительного значения для отображения предварительного круга.
       setIndForPrelim(0)
       await awaitingChanges(DELAY_IN_MS);
@@ -99,7 +99,7 @@ export const ListPage: React.FC = () => {
       //Индекс хвоста списка.
       const tailIndex = listValues.length - 1;
       //Предварительный круг со значением.
-      setPrelimForAdd(<Circle state={ElementStates.Changing} letter={inputValue} isSmall={true} />)
+      setPrelimForAdd(<Circle state={ElementStates.Changing} letter={inputValue} isSmall={true} extraClass={styles.small} />)
       //Указать индекс предварительного значения для отображения предварительного круга.
       setIndForPrelim(tailIndex);
       await awaitingChanges(DELAY_IN_MS);
@@ -127,7 +127,7 @@ export const ListPage: React.FC = () => {
         handlePrepend();
       } else {
         //Предварительный круг со значением.
-        setPrelimForAdd(<Circle state={ElementStates.Changing} letter={inputValue} isSmall={true} />);
+        setPrelimForAdd(<Circle state={ElementStates.Changing} letter={inputValue} isSmall={true} extraClass={styles.small} />);
         await awaitingChanges(DELAY_IN_MS);
         //Запуск анимации поиска неободимого элемента по индексу и вставка его в список.
         await animationAddByIndexList(list, setListValues, setIndForPrelim, inputIndex, inputValue);
@@ -145,7 +145,7 @@ export const ListPage: React.FC = () => {
       //Значение для удаления.
       const deleteValue = listValues[0].value;
       //Установить предварительный круг со значением.
-      setValueForDelete(<Circle state={ElementStates.Changing} letter={deleteValue} isSmall={true} />);
+      setValueForDelete(<Circle state={ElementStates.Changing} letter={deleteValue} isSmall={true} extraClass={styles.small} />);
       //Установить индекс предварительного круга.
       setIndForDelete(0);
       //Запуск анимации.
@@ -166,7 +166,7 @@ export const ListPage: React.FC = () => {
       //Значение для удаления.
       const deleteValue = listValues[listValues.length - 1].value;
       //Установить предварительный круг со значением.
-      setValueForDelete(<Circle state={ElementStates.Changing} letter={deleteValue} isSmall={true} />);
+      setValueForDelete(<Circle state={ElementStates.Changing} letter={deleteValue} isSmall={true} extraClass={styles.small} />);
       //Установить индекс предварительного круга.
       setIndForDelete(listValues.length - 1);
       //Запуск анимации.
@@ -198,7 +198,7 @@ export const ListPage: React.FC = () => {
       //Запуск анимации при удалении.
       await animationDeleteByIndex(list, inputIndexInNumber, setListValues);
       //Установить круг ниже необходимого индекса для анимации удаления и указание места.
-      setValueForDelete(<Circle state={ElementStates.Changing} letter={deleteValue} isSmall={true} />)
+      setValueForDelete(<Circle state={ElementStates.Changing} letter={deleteValue} isSmall={true} extraClass={styles.small} />)
       setIndForDelete(inputIndexInNumber);
       //Удалить значение из списка.
       list.deleteByIndex(inputIndexInNumber);
@@ -244,6 +244,7 @@ export const ListPage: React.FC = () => {
     <SolutionLayout title="Связный список">
       <div className={`${styles['flex-container']}`}>
         <Input
+          name="value"
           maxLength={4}
           extraClass={styles.input}
           isLimitText
@@ -277,6 +278,7 @@ export const ListPage: React.FC = () => {
       </div>
       <div className={`${styles['flex-container']}`}>
         <Input
+          name="index"
           extraClass={styles.input}
           onChange={handleInputIndexChange}
           value={inputIndexField}
