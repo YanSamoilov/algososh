@@ -10,4 +10,17 @@ export interface numsProps {
     state: ElementStates;
 }
 
+export interface stringCharsProps {
+  adding?: boolean;
+  deleting?: boolean;
+  noArrow?: boolean;
+  tail?: string;
+  head?: string;
+  char?: string;
+  state: ElementStates;
+  extraCircle?: {
+    char: string;
+  }
+}
+
 export type pagesArrayProps = symbolProps | numsProps;
